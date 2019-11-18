@@ -3,9 +3,10 @@
 #include "hashtable.h"
 // #include "../doubly_linkedlist/dlinkedlist.h"
 
-int hashFunc(char * str) {
+long hashFunc(char * str) {
     char c = *str;
-    int i = 1, sum = 0;
+    int i = 1;
+    long sum = 0;
     
     while (c != '\0')
     {
@@ -14,8 +15,9 @@ int hashFunc(char * str) {
         c = *(str+i);
         i++;       
     }    
-    // printf("%d\n", sum);
-    return sum % 10;
+    sum = (sum*sum + 10067)*10037;
+    printf("%ld\n", sum);
+    return sum % MAX_TABLE_SIZE;
 }
 
 struct hashtable * initHashtable() {
@@ -26,7 +28,7 @@ struct hashtable * initHashtable() {
         return;
     }
 
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < MAX_TABLE_SIZE; i++)
     {
         table->data[i] = initDLL();
     }
@@ -37,18 +39,19 @@ struct hashtable * initHashtable() {
 
 void insert(struct hashtable * table, char * str) {
     int index = hashFunc(str);
-    // printf("index -> %d\n", index);
+    printf("str => %s  index -> %d\n", str, index);
     insertLast( ((table->data)[index]), str);
-    table->size += 1; 
+    // table->size += 1; 
 }
 
 void prtHashTable(struct hashtable * table) {
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < MAX_TABLE_SIZE; i++)
     {
         if(table->data[i]->size) {
             // printf("index -> %d , count -> %d\n", i, table->data[i]->size);
             prtList(table->data[i]);
         }
-    }
-    
+    }   
 }
+
+void searchHashTable(struct hashtable * table, char * term)

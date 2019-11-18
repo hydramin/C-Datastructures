@@ -1,4 +1,5 @@
 #!/bin/bash
 
+rm -f ./bin/libmydll.a
 make
 ./bin/dlinkedlist

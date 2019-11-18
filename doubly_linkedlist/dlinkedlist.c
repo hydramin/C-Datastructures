@@ -72,8 +72,9 @@ void prtList(struct listNodes * list) {
     struct node_t * node_i = list->head;
     for ( ; node_i != NULL; node_i = node_i->after)
     {
-        printf("-> %s\n", node_i->data);
+        printf("-> %s ", node_i->data);
     }    
+    printf("\n");
 }
 
 
