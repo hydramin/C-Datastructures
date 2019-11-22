@@ -1,0 +1,5 @@
+#!/bin/bash
+
+rm -f ./bin/libmydllmap.a
+make
+./bin/dllmap.exe

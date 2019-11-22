@@ -16,14 +16,15 @@ int main(int argc, char const *argv[])
     printf("---------IN ORDER TRAVERSAL-----------\n");
     inorderTnodes(root);
     printf("\n");
+    printf("---------POST ORDER TRAVERSAL-----------\n");
     postorderTnodes(root);
     printf("\n");
+    printf("---------PRE ORDER TRAVERSAL-----------\n");
     preorderTnodes(root);
     printf("\n");
     freeTree(root);
-    // free(root);
     
-    preorderTnodes(root);
+    // preorderTnodes(root);
 
     return 0;
 }

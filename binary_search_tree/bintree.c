@@ -9,7 +9,7 @@ struct tnode * initTree() {
 }
 
 // true for left false for right insertion
-bool lorr(int rootkey, int newkey) {
+bool isLeft(int rootkey, int newkey) {
     if (rootkey < newkey)
     {
         return false;
@@ -30,7 +30,7 @@ void insertTree(struct tnode * root, int key, char * value) {
         printf("this -> (%d - %s) parent --> %s\n", root->key, root->value, (root->parent)? root->parent->value:"NULL");
     } else {        
         // Do a comparison and add to left (<) or right(>=)
-        if(lorr(root->key, key)) {
+        if(isLeft(root->key, key)) { // true for left false for right
             if (root->lchild == NULL)
             {
                 root->lchild = initTree();
@@ -65,7 +65,7 @@ void postorderTnodes(struct tnode * root) {
 }
 
 void preorderTnodes(struct tnode * root) {    
-    printf("(%d <-> %s) ", root->key, root->height,root->value);
+    printf("(%d <-> %s) ", root->key, root->value);
     if(root->lchild != NULL) preorderTnodes(root->lchild);
     if(root->rchild != NULL) preorderTnodes(root->rchild);    
 }

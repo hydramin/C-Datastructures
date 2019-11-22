@@ -16,7 +16,7 @@ long hashFunc(char * str) {
         i++;       
     }    
     sum = (sum*sum + 10067)*10037;
-    printf("%ld\n", sum);
+    // printf("%ld\n", sum);
     return sum % MAX_TABLE_SIZE;
 }
 
@@ -37,10 +37,10 @@ struct hashtable * initHashtable() {
     return table;
 }
 
-void insert(struct hashtable * table, char * str) {
-    int index = hashFunc(str);
-    printf("str => %s  index -> %d\n", str, index);
-    insertLast( ((table->data)[index]), str);
+void insert(struct hashtable * table, char * key, char * value) {
+    int index = hashFunc(key);
+    printf("key => %s  index -> %d\n", key, index);
+    insertLast( ((table->data)[index]), key, value);
     // table->size += 1; 
 }
 
@@ -54,4 +54,4 @@ void prtHashTable(struct hashtable * table) {
     }   
 }
 
-void searchHashTable(struct hashtable * table, char * term)
+// void searchHashTable(struct hashtable * table, char * term)
