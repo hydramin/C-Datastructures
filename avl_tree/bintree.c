@@ -21,57 +21,89 @@ int getTnodeHeight(struct tnode * tnode) {
     return (tnode == NULL)? -1: tnode->height;
 }
 
+int setHeight(struct tnode * root) {
+    if(root == NULL) return -1;
+    root->height = 1 + MAX(setHeight(root->lchild), setHeight(root->rchild));
+    root->lc_height = getTnodeHeight(root->lchild);
+    root->rc_height = getTnodeHeight(root->rchild);
+    printf(">>>>>>>>>>>>>>>>>>>>>>>>. this >> %d height >> %d || L >> %d || R >> %d\n", root->key, root->height, (root->lchild == NULL)?666:root->lchild->key, (root->rchild == NULL)?666:root->rchild->key);
+    return root->height;
+}
+
 void leftLeftRotation(struct tnode * root) {
     printf("**LEFT LEFT** at (%d, %s)\n", root->key, root->value);
-    root->lchild->parent = root->parent; 
-    root->parent->lchild = root->lchild;
-    root->parent = root->lchild;
-    root->lchild->rchild = root;
-    root->lchild = NULL;
+    struct tnode * newRoot = root->lchild;
+    struct tnode oldRoot = *root;
+    *root = *newRoot;
+    *newRoot = oldRoot;
+
+    root->parent = newRoot->parent;
+    root->rchild = newRoot;
+    newRoot->parent = root;
+    root->lchild->parent = root;
+    newRoot->lchild = NULL;
+    // preorderTnodes(root); printf("\n");
+    setHeight(root);
+    // preorderTnodes(root); printf("\n");
 }
 
 void rightRightRotation(struct tnode * root) {
     printf("**RIGHT RIGHT** at (%d, %s)\n", root->key, root->value);
-    root->parent->rchild = root->rchild;
-    root->rchild->parent = root->parent;
-    root->rchild->lchild = root;
-    root->parent = root->rchild;
-    root->rchild = NULL;
+   
+    struct tnode oldRoot = *root; // 5
+    struct tnode newRoot = *(root->rchild); // 6
+    struct tnode * newRootP = root->rchild; // --> |6|
+    *newRootP = oldRoot;
+    *root = newRoot;
+    root->lchild = newRootP;
+    root->parent = newRootP->parent;
+    newRootP->parent = root;
+    root->rchild->parent = root;
+    newRootP->rchild = NULL;
+    // preorderTnodes(root); printf("\n");
+    setHeight(root);
+    // preorderTnodes(root); printf("\n");
+    // printf("||||||||||||||||||||||||||||||||||||||||||||||||||| %d %s\n", root->key, root->value);
+    // printf("||||||||||||||||||||||||||||||||||||||||||||||||||| %d s\n", root->lchild->key, root->lchild->value);
 }
 
 void balance(struct tnode * root ) {
-    
     int lch = root->lc_height, rch = root->rc_height;
-
 
     if (abs(lch - rch) > 1)
     {
         if(lch > rch) {
             if(root->lchild->lc_height > root->lchild->rc_height) { // left left case
-                leftLeftRotation(root);               
-            } else if (root->lchild->lc_height < root->lchild->rc_height) { // left right case            
+                           
+                leftLeftRotation(root);    
+            } else if (root->lchild->lc_height < root->lchild->rc_height) { // left right case 
                 printf("**LEFT RIGHT** at (%d, %s)\n", root->key, root->value);
                 // Do the adjustment rotation first
-                root->lchild->rchild->parent = root;
-                root->lchild->rchild->lchild = root->lchild;
-                root->lchild->parent = root->lchild->rchild;
-                root->lchild = root->lchild->rchild;
-                root->lchild->lchild = NULL;
+                struct tnode * rootL = root->lchild;
+                rootL->rchild->lchild = rootL;
+                rootL->parent = rootL->lchild;
+                root->lchild = rootL->rchild;
+                rootL->rchild->parent = root;
+                rootL->rchild = NULL;
+               
+                printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> %d %d\n", root->key, root->lchild->key);
                 leftLeftRotation(root);
             }
             
         } else if (lch < rch) {
             if(root->rchild->lc_height > root->rchild->rc_height) { // right left case
                 printf("**RIGHT LEFT** at (%d, %s)\n", root->key, root->value);
-                root->rchild->lchild->rchild = root->rchild;
-                root->rchild->parent = root->rchild->lchild;
-                root->rchild->lchild->parent = root;
-                root->rchild = root->rchild->lchild;
-                root->rchild->rchild = NULL;                
+                struct tnode * rootR = root->rchild;
+                rootR->parent = root->lchild;
+                rootR->lchild->rchild = rootR;
+                rootR->lchild->parent = root;
+                root->rchild = rootR->lchild;
+                rootR->lchild = NULL;                
                 rightRightRotation(root);
-
-            } else if (root->rchild->lc_height < root->rchild->rc_height) {// right right case            
-                rightRightRotation(root);
+            } else if (root->rchild->lc_height < root->rchild->rc_height) {// right right case   
+                        
+                rightRightRotation(root);    
+                preorderTnodes(root); printf("\n");            
             }
         }
     }    
@@ -107,8 +139,6 @@ void insertTree(struct tnode * root, int key, char * value) {
     root->lc_height = getTnodeHeight(root->lchild);
     root->rc_height = getTnodeHeight(root->rchild);
     root->height = 1 + MAX(root->lc_height, root->rc_height);
-    printf("(%d <-> %s) <--- **, height = %d\n\n", root->key, root->value, root->height);
-    // determine balancing factor
     balance(root);
 }
 
@@ -125,7 +155,7 @@ void postorderTnodes(struct tnode * root) {
 }
 
 void preorderTnodes(struct tnode * root) {    
-    printf("(%d <-> %s) ", root->key, root->value);
+    printf("(%d <-> %s) height >> %d | ", root->key, root->value, root->height);
     if(root->lchild != NULL) preorderTnodes(root->lchild);
     if(root->rchild != NULL) preorderTnodes(root->rchild);    
 }

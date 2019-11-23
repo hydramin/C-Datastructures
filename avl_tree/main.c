@@ -10,6 +10,7 @@ int main(int argc, char const *argv[])
     // int numsRR[] = {10, 2, 11, 12, 13}; // LEFT LEFT CASE
     // int numsRL[] = {10, 5, 12, 14, 13}; // LEFT LEFT CASE
     int nums[] = {23, 15, 35, 10, 13, 27, 30}; // LEFT LEFT CASE
+    // int numsf[] = {5, 6, 7};
 
     for (int i = 0; i < 7; i++)
     {
@@ -17,15 +18,19 @@ int main(int argc, char const *argv[])
         insertTree(root, nums[i], *(names+i));
     }
     printf("height = %d\n", root->height);
-    printf("---------IN ORDER TRAVERSAL-----------\n");
-    inorderTnodes(root);
-    printf("\n");
+    // printf("---------IN ORDER TRAVERSAL-----------\n");
+    // inorderTnodes(root);
+    // printf("\n");
     // printf("---------POST ORDER TRAVERSAL-----------\n");
     // postorderTnodes(root);
     // printf("\n");
-    // printf("---------PRE ORDER TRAVERSAL-----------\n");
-    // preorderTnodes(root);
-    // printf("\n");
+    printf("---------PRE ORDER TRAVERSAL-----------\n");
+    
+    printf("--> %d >> %d\n", root->key, root->height);
+    // printf(" %s--> %d >> %d\n"," root->lchild->value", root->lchild->key, root->lchild->height);
+
+    preorderTnodes(root);
+    printf("\n");
     // freeTree(root);
     
     // preorderTnodes(root);
