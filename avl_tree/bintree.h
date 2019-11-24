@@ -26,3 +26,5 @@ void inorderTnodes(struct tnode * );
 void postorderTnodes(struct tnode * );
 void preorderTnodes(struct tnode * );
 void freeTree(struct tnode * );
+struct tnode * getTNode(struct tnode *, int);
+bool deleteNode(struct tnode * , int );

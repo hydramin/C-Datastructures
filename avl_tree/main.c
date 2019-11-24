@@ -25,12 +25,11 @@ int main(int argc, char const *argv[])
     // postorderTnodes(root);
     // printf("\n");
     printf("---------PRE ORDER TRAVERSAL-----------\n");
-    
-    printf("--> %d >> %d\n", root->key, root->height);
-    // printf(" %s--> %d >> %d\n"," root->lchild->value", root->lchild->key, root->lchild->height);
-
-    preorderTnodes(root);
-    printf("\n");
+    preorderTnodes(root); printf("\n");
+    deleteNode(root, 27);
+    preorderTnodes(root); printf("\n");
+    deleteNode(root, 35);
+    preorderTnodes(root); printf("\n");
     // freeTree(root);
     
     // preorderTnodes(root);

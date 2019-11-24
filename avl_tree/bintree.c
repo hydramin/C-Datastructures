@@ -1,5 +1,12 @@
 #include "bintree.h"
 
+//prototypes
+struct tnode * getTNode(struct tnode *, int);
+bool isLeaf(struct tnode * );
+bool isRoot(struct tnode * );
+
+// functions
+
 struct tnode * initTree() {
     struct tnode * root = malloc(sizeof(struct tnode));
     if(root == NULL) {
@@ -26,7 +33,7 @@ int setHeight(struct tnode * root) {
     root->height = 1 + MAX(setHeight(root->lchild), setHeight(root->rchild));
     root->lc_height = getTnodeHeight(root->lchild);
     root->rc_height = getTnodeHeight(root->rchild);
-    printf(">>>>>>>>>>>>>>>>>>>>>>>>. this >> %d height >> %d || L >> %d || R >> %d\n", root->key, root->height, (root->lchild == NULL)?666:root->lchild->key, (root->rchild == NULL)?666:root->rchild->key);
+    // printf(">>>>>>>>>>>>>>>>>>>>>>>>. this >> %d height >> %d || L >> %d || R >> %d\n", root->key, root->height, (root->lchild == NULL)?666:root->lchild->key, (root->rchild == NULL)?666:root->rchild->key);
     return root->height;
 }
 
@@ -34,6 +41,7 @@ void leftLeftRotation(struct tnode * root) {
     printf("**LEFT LEFT** at (%d, %s)\n", root->key, root->value);
     // save pointers
     struct tnode * tnode2p = root->lchild;
+    
     // exchange
     struct tnode tnode2 = *tnode2p;
     *tnode2p = *root;
@@ -43,23 +51,11 @@ void leftLeftRotation(struct tnode * root) {
     if(tnode2p->lchild != NULL)
         tnode2p->lchild->parent = tnode2p;
     root->parent = tnode2p->parent;
+    if(root->lchild != NULL)
+        root->lchild->parent = root;
     tnode2p->parent = root;
     root->rchild = tnode2p;
-
-
-    // struct tnode * newRoot = root->lchild;
-    // struct tnode oldRoot = *root;
-    // *root = *newRoot;
-    // *newRoot = oldRoot;
-
-    // root->parent = newRoot->parent;
-    // root->rchild = newRoot;
-    // newRoot->parent = root;
-    // root->lchild->parent = root;
-    // newRoot->lchild = NULL;
-    // preorderTnodes(root); printf("\n");
     setHeight(root);
-    // preorderTnodes(root); printf("\n");
 }
 
 void rightRightRotation(struct tnode * root) {
@@ -79,7 +75,8 @@ void rightRightRotation(struct tnode * root) {
     root->parent = tnode2p->parent;
     tnode2p->parent = root;
     root->lchild = tnode2p;
-
+    if(root->rchild != NULL)
+        root->rchild->parent = root;
     setHeight(root);
 }
 
@@ -111,7 +108,7 @@ void balance(struct tnode * root ) {
                 tnode2p->parent = tnode3p->parent;
                 tnode2p->lchild = tnode3p;
                 tnode3p->parent = tnode2p;
-
+                printf("ooooooooooooooooooooooooooooooooooooooooooooooo %d p> %d\n", root->lchild->lchild->parent->key, 888);
                 leftLeftRotation(root);
             }
             
@@ -131,7 +128,7 @@ void balance(struct tnode * root ) {
                 tnode2p->parent = tnode3p->parent;
                 tnode3p->parent = tnode2p;
                 tnode2p->rchild = tnode3p;
-     
+                     
                 rightRightRotation(root);
             } else if (root->rchild->lc_height < root->rchild->rc_height) {// right right case   
                         
@@ -175,13 +172,61 @@ void insertTree(struct tnode * root, int key, char * value) {
     balance(root);
 }
 
-// struct tnode * getTNode(int key) {
+struct tnode * getTNode(struct tnode * root, int key) {
+    if(root == NULL) return NULL;
+    if(root->key == key) return root;
+
+    if(root->key > key) return getTNode(root->lchild, key);
+    if(root->key < key) return getTNode(root->rchild, key);
+}
+
+bool isRoot(struct tnode * tnode) {
+    return (tnode != NULL && tnode->parent == NULL);
+}
+
+bool deleteNode(struct tnode * root, int key) {
+    struct tnode * node = getTNode(root, key);
+    if (node != NULL)
+    {
+        if (isLeaf(node))
+        {
+            // simple deletion
+            if(isRoot(node)) {
+                free(node);
+                node = NULL;
+                printf("FREED ROOT LEAF \n");
+            } else {
+                struct tnode * nparent = node->parent;
+                // find if the node is left or right child of the parent
+                if(nparent->rchild == node) {
+                    printf("RIGHT FREED REGULAR LEAF %ld %ld\n", nparent->rchild, node);
+                    free(node);
+                    nparent->rchild = NULL;
+                } else if (nparent->lchild == node)
+                {
+                    free(node);
+                    nparent->lchild = NULL;
+                    printf("LEFT FREED REGULAR LEAF %ld %ld\n", nparent->lchild, node);                    
+                }
+                
+                
+            }
+            
+        }
+        
+        // printf("||||||||||||||||||||||||| DELETED ---> (%d <-> %s) \n", node->key, node->value);
+        return true;
+    } else 
+    {
+        printf("||||||||||||||||||||||||| DELETED ---> NOTHING \n");;
+        return false;
+    }
     
-// }
+}
 
-// void deleteNode(int key) {
-
-// }
+bool isLeaf(struct tnode * tnode) {
+    return (tnode->height == 0);
+}
 
 void inorderTnodes(struct tnode * root) {    
     if(root->lchild != NULL) inorderTnodes(root->lchild);
