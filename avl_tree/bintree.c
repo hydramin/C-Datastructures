@@ -32,16 +32,31 @@ int setHeight(struct tnode * root) {
 
 void leftLeftRotation(struct tnode * root) {
     printf("**LEFT LEFT** at (%d, %s)\n", root->key, root->value);
-    struct tnode * newRoot = root->lchild;
-    struct tnode oldRoot = *root;
-    *root = *newRoot;
-    *newRoot = oldRoot;
+    // save pointers
+    struct tnode * tnode2p = root->lchild;
+    // exchange
+    struct tnode tnode2 = *tnode2p;
+    *tnode2p = *root;
+    *root = tnode2;
+    // correct pointers
+    tnode2p->lchild = root->rchild;
+    if(tnode2p->lchild != NULL)
+        tnode2p->lchild->parent = tnode2p;
+    root->parent = tnode2p->parent;
+    tnode2p->parent = root;
+    root->rchild = tnode2p;
 
-    root->parent = newRoot->parent;
-    root->rchild = newRoot;
-    newRoot->parent = root;
-    root->lchild->parent = root;
-    newRoot->lchild = NULL;
+
+    // struct tnode * newRoot = root->lchild;
+    // struct tnode oldRoot = *root;
+    // *root = *newRoot;
+    // *newRoot = oldRoot;
+
+    // root->parent = newRoot->parent;
+    // root->rchild = newRoot;
+    // newRoot->parent = root;
+    // root->lchild->parent = root;
+    // newRoot->lchild = NULL;
     // preorderTnodes(root); printf("\n");
     setHeight(root);
     // preorderTnodes(root); printf("\n");
@@ -50,21 +65,22 @@ void leftLeftRotation(struct tnode * root) {
 void rightRightRotation(struct tnode * root) {
     printf("**RIGHT RIGHT** at (%d, %s)\n", root->key, root->value);
    
-    struct tnode oldRoot = *root; // 5
-    struct tnode newRoot = *(root->rchild); // 6
-    struct tnode * newRootP = root->rchild; // --> |6|
-    *newRootP = oldRoot;
-    *root = newRoot;
-    root->lchild = newRootP;
-    root->parent = newRootP->parent;
-    newRootP->parent = root;
-    root->rchild->parent = root;
-    newRootP->rchild = NULL;
-    // preorderTnodes(root); printf("\n");
+    //save the pointers
+    struct tnode * tnode2p = root->rchild;
+    // exchange root and tnode2
+    struct tnode tnode2 = *tnode2p;
+    *tnode2p = *root;
+    *root = tnode2;
+    // correct pointers
+    tnode2p->rchild = root->lchild;
+    if (tnode2p->rchild != NULL)
+        tnode2p->rchild->parent = tnode2p;
+    
+    root->parent = tnode2p->parent;
+    tnode2p->parent = root;
+    root->lchild = tnode2p;
+
     setHeight(root);
-    // preorderTnodes(root); printf("\n");
-    // printf("||||||||||||||||||||||||||||||||||||||||||||||||||| %d %s\n", root->key, root->value);
-    // printf("||||||||||||||||||||||||||||||||||||||||||||||||||| %d s\n", root->lchild->key, root->lchild->value);
 }
 
 void balance(struct tnode * root ) {
@@ -78,27 +94,44 @@ void balance(struct tnode * root ) {
                 leftLeftRotation(root);    
             } else if (root->lchild->lc_height < root->lchild->rc_height) { // left right case 
                 printf("**LEFT RIGHT** at (%d, %s)\n", root->key, root->value);
-                // Do the adjustment rotation first
-                struct tnode * rootL = root->lchild;
-                rootL->rchild->lchild = rootL;
-                rootL->parent = rootL->lchild;
-                root->lchild = rootL->rchild;
-                rootL->rchild->parent = root;
-                rootL->rchild = NULL;
-               
-                printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> %d %d\n", root->key, root->lchild->key);
+                
+                //save pointers
+                struct tnode * tnode2p = root->lchild;
+                struct tnode * tnode3p = root->lchild->rchild;
+
+                //exchange places
+                struct tnode tnode2 = *tnode2p;
+                *tnode2p = *tnode3p;
+                *tnode3p = tnode2;
+
+                // correct pointers
+                tnode3p->rchild = tnode2p->lchild;
+                if (tnode3p->rchild != NULL)
+                    tnode3p->rchild->parent = tnode3p;
+                tnode2p->parent = tnode3p->parent;
+                tnode2p->lchild = tnode3p;
+                tnode3p->parent = tnode2p;
+
                 leftLeftRotation(root);
             }
             
         } else if (lch < rch) {
             if(root->rchild->lc_height > root->rchild->rc_height) { // right left case
                 printf("**RIGHT LEFT** at (%d, %s)\n", root->key, root->value);
-                struct tnode * rootR = root->rchild;
-                rootR->parent = root->lchild;
-                rootR->lchild->rchild = rootR;
-                rootR->lchild->parent = root;
-                root->rchild = rootR->lchild;
-                rootR->lchild = NULL;                
+                struct tnode * tnode2p = root->rchild;
+                struct tnode * tnode3p = root->rchild->lchild;
+                // exchange places
+                struct tnode tnode2 = *tnode2p;
+                *tnode2p = *tnode3p;
+                *tnode3p = tnode2;
+                // correct the pointers
+                tnode3p->lchild = tnode2p->rchild;
+                if(tnode2p->rchild != NULL)
+                    tnode2p->rchild->parent = tnode3p;
+                tnode2p->parent = tnode3p->parent;
+                tnode3p->parent = tnode2p;
+                tnode2p->rchild = tnode3p;
+     
                 rightRightRotation(root);
             } else if (root->rchild->lc_height < root->rchild->rc_height) {// right right case   
                         
@@ -141,6 +174,14 @@ void insertTree(struct tnode * root, int key, char * value) {
     root->height = 1 + MAX(root->lc_height, root->rc_height);
     balance(root);
 }
+
+// struct tnode * getTNode(int key) {
+    
+// }
+
+// void deleteNode(int key) {
+
+// }
 
 void inorderTnodes(struct tnode * root) {    
     if(root->lchild != NULL) inorderTnodes(root->lchild);
