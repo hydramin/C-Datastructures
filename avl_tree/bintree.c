@@ -184,44 +184,136 @@ bool isRoot(struct tnode * tnode) {
     return (tnode != NULL && tnode->parent == NULL);
 }
 
-bool deleteNode(struct tnode * root, int key) {
-    struct tnode * node = getTNode(root, key);
-    if (node != NULL)
+struct tnode * inorderSuccessor(struct tnode * root) {    
+    struct tnode * successor = root->rchild;
+    if(successor == NULL)
     {
-        if (isLeaf(node))
+        printf("||||||||||||||||||||||||| INORDER SUCCESSOR LEAF ---> (%d <-> %s) \n", root->key, root->value);
+        return NULL;
+    }
+    while(successor->lchild != NULL) {
+        successor = successor->lchild;
+    }
+    return successor;
+}
+
+struct tnode * inorderPredecessor(struct tnode * root) {    
+    struct tnode * predecessor = root->lchild;
+    if(predecessor == NULL) return NULL;
+    while(predecessor->rchild != NULL) {
+        predecessor = predecessor->rchild;
+    }
+    return predecessor;
+}
+
+bool deleteTNode(struct tnode * root, int key) {
+    if(root == NULL) return false;
+    if(root->key == key) {
+        if (isLeaf(root))
         {
-            // simple deletion
-            if(isRoot(node)) {
-                free(node);
-                node = NULL;
-                printf("FREED ROOT LEAF \n");
-            } else {
-                struct tnode * nparent = node->parent;
-                // find if the node is left or right child of the parent
-                if(nparent->rchild == node) {
-                    printf("RIGHT FREED REGULAR LEAF %ld %ld\n", nparent->rchild, node);
-                    free(node);
-                    nparent->rchild = NULL;
-                } else if (nparent->lchild == node)
-                {
-                    free(node);
-                    nparent->lchild = NULL;
-                    printf("LEFT FREED REGULAR LEAF %ld %ld\n", nparent->lchild, node);                    
-                }
-                
+            struct tnode * parentp = root->parent;
+            if (parentp == NULL) // root leaf
+            {
+                printf("||||||||||||||||||||||||| ROOT LEAF DELETED ---> (%d <-> %s) \n", root->key, root->value);
+                root->value = NULL;
+                free(root);
+            } else // non root leaf
+            {
+                printf("||||||||||||||||||||||||| REGULAR LEAF DELETED ---> (%d <-> %s) \n", root->key, root->value);
+                if(parentp->lchild == root) {root->value = NULL; free(root); parentp->lchild = NULL;}
+                if(parentp->rchild == root) {root->value = NULL; free(root); parentp->rchild = NULL;}
                 
             }
+        } else
+        {
+            // find inorder predessor or inorder successor
+            struct tnode * successor = inorderSuccessor(root);
+            struct tnode * predecessor = inorderPredecessor(root);
+            bool snext = root->rchild != successor;
+            // printf("33333333333333asdf333333333333 %ld %ld\n",root->rchild, successor);
+            bool pnext = root->lchild != predecessor;
+            if (predecessor != NULL)
+            {
+                
+                printf("|||| INNER TNODE DELETED ---> (%d <-> %s) SUCC => %s PRED => %s \n", root->key, root->value, successor, predecessor->lchild);
+                // printf("|||| INNER TNODE DELETED ---> (%d <-> %s) SUCC => %d PRED => %d \n", root->key, root->value, successor->key, predecessor->key);
+                // printf("p > %d pp > %d pl > %s pr > %s\n", predecessor->key, predecessor->parent->key, predecessor->lchild, predecessor->rchild);
+                // printf("r > %d rp > %d rl > %d rr > %d\n", root->key, (root->parent == NULL)?666:root->parent->key, root->lchild->key, root->rchild->key);
+
+
+
+                // exchange root and predecessor
+                struct tnode deleted = *root; // 15
+                *root = *predecessor; // r = 14
+                *predecessor = deleted; // p = 15
+                // printf("p > %d pp > %d pl > %d pr > %d\n", predecessor->key, (predecessor->parent == NULL)?666:predecessor->parent->key, predecessor->lchild->key, predecessor->rchild->key);
+                // printf("r > %d rp > %d rl > %s rr > %s\n", root->key, root->parent->key, root->lchild, root->rchild);
+                // reestablish pointers for the new root from the predecessor
+                struct tnode * predecessorParent = root->parent;
+                root->parent = predecessor->parent;
+                root->rchild = predecessor->rchild;
+                if(predecessor->rchild != root) { 
+                    root->lchild = predecessor->lchild;
+                    predecessorParent->rchild = NULL; 
+                    }
+                // printf("kkkkkkkkkkkkkkkkkkkkkkkkkk r >> %d, rp >> %d, rr >> %d, rl >> %d\n", root->key, (root->parent == NULL)?666:root->parent->key, root->rchild->key, root->lchild->key);
+                // printf("p > %d pp > %d pl > %d pr > %d\n", predecessor->key, predecessor->parent->key, predecessor->lchild, root->rchild->key);
+                // printf("r > %d rp > %d rl > %d rr > %d\n", root->key, root->parent->key, predecessor->lchild, root->rchild->key);
+                // // free the predecessor
+                predecessor->value = NULL;
+                free(predecessor);
+            } else if (successor != NULL)
+            {
+                printf("|||| INNER TNODE DELETED ---> (%d <-> %s) SUCC => %d PRED => %d \n", root->key, root->value, successor->key, predecessor->key);
+                // printf("p > %d pp > %d pl > %s pr > %d\n", successor->key, successor->parent->key, successor->lchild, successor->rchild->key);
+                // printf("r > %d rp > %d rl > %d rr > %d\n", root->key, root->parent->key, root->lchild->key, root->rchild->key);
+
+                // exchange root and predecessor
+                struct tnode deleted = *root; // 15
+                *root = *successor; // r = 14
+                *successor = deleted; // p = 15
+                // printf("p > %d pp > %d pl > %d pr > %d\n", successor->key, successor->parent->key, successor->lchild->key, successor->rchild->key);
+                // printf("r > %d rp > %d rl > %s rr > %d\n", root->key, root->parent->key, root->lchild, root->rchild->key);
+                // reestablish pointers for the new root from the successor
+                struct tnode * successorParent = root->parent; // root new
+                root->parent = successor->parent;
+                if(snext) {
+                    root->rchild = successor->rchild;
+                    successorParent->lchild = NULL;
+                    // printf("333333333333444433333333333333 %ld %ld\n",successor->rchild->key, root->rchild->key);
+                }
+                root->lchild = successor->lchild;
+                // printf("kkkkkkkkkkkkkkkkkkkkkkkkkk r >> %d, rp >> %d, rr >> %d, rl >> %d\n", root->key, root->parent->key, root->rchild->key, root->lchild->key);
+                // printf("p > %d pp > %d pl > %d pr > %d\n", predecessor->key, predecessor->parent->key, predecessor->lchild, root->rchild->key);
+                // printf("r > %d rp > %d rl > %d rr > %d\n", root->key, root->parent->key, predecessor->lchild, root->rchild->key);
+                // // free the predecessor
+                successor->value = NULL;
+                free(successor);
+                preorderTnodes(root);
+                
+            } else {
+                return false;
+            }
+            
             
         }
-        
-        // printf("||||||||||||||||||||||||| DELETED ---> (%d <-> %s) \n", node->key, node->value);
         return true;
-    } else 
-    {
-        printf("||||||||||||||||||||||||| DELETED ---> NOTHING \n");;
-        return false;
     }
-    
+    bool temp;
+    if (root->key > key) // left
+    {
+        temp = deleteTNode(root->lchild, key);
+        printf("ppppppppppppppppppppppppppp %d\n", root->key);
+        setHeight(root);   
+    }
+    if(root->key < key) // right
+    {
+        temp = deleteTNode(root->rchild, key);
+        setHeight(root);
+    }
+    printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+    balance(root);
+    return temp;
 }
 
 bool isLeaf(struct tnode * tnode) {

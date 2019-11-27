@@ -1,6 +1,4 @@
-#include "linkedlist.h"
-#include <stdlib.h>
-#include <stdio.h>
+#include "glinkedlist.h"
 
 struct node_t *getLastNode(struct node_t *node) {
     struct node_t * node_i = node;
@@ -83,7 +81,7 @@ int count(struct node_t * list) {
     return count;
 }
 
-char * getByIndex(struct node_t * list, int index) {
+void * getByIndex(struct node_t * list, int index) {
     int size = count(list);
     
     if(index >= 0 && index <= size-1 && size != 0) {
@@ -95,13 +93,13 @@ char * getByIndex(struct node_t * list, int index) {
         }
         return list->data;        
     }
-    return "NULL";
+    return NULL;
 }
 
 
-void prtList(struct node_t * node) {
+void prtList(struct node_t * node, void (*prtCallback)(void *)) {
     for ( struct node_t * node_i = node; node_i != NULL; node_i = node_i->next){
-        printf("%s ", node_i->data);
+        (*prtCallback)(node_i->data);
     }
     printf("\n");
 }

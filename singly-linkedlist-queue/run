@@ -1,0 +1,5 @@
+#!/bin/bash
+
+rm ./bin/libsllqueue.a -f
+make
+./bin/sllqueue.exe

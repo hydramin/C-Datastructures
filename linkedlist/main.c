@@ -2,46 +2,34 @@
 #include <stdlib.h>
 #include "linkedlist.h"
 
-struct point
-{
-    int x;
-    int y;
-};
-
-int getX(struct point *pt) {
-    return pt->x;
-}
-
-int getY(struct point *pt) {
-    return pt->y;
-}
-
-struct point * newPt(int x, int y) {
-    struct point *pt;
-    pt = malloc(sizeof(struct point));  
-    pt->x = 5;
-    pt->y = 8;
-    return pt;
-}
-
 int main(int argc, char const *argv[])
-{
-    // struct point p1 = {2,3}, *pp;
-    // pp = &p1;
-    // struct point *p2 = newPt(2,3);
-    // printf("%d, %d\n", getX(p2), getY(p2));
+{   
+    struct node_t * nodeL, * nodeF;
+    nodeL = initSLL();
+    nodeF = initSLL();
+    char *names[] = {"Amin", "Afu", "Nadia", "Genet", "Milky", "Mahmoud" };
 
-    struct node_t *node;
-    node = init();
-    char *names[5] = {"Amin", "Afu", "Nadia", "Genet", "Milky", "Mahmoud" };
-
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < 6; i++)
     {
         char * temp = *(names+i);        
-        insert(node, temp);
+        insertLast(nodeL, temp);
+        insertFirst(nodeF, temp);
     }    
 
-    prtList(node);
+    prtList(nodeL);
+    printf("count = %d\n", count(nodeL));
+    prtList(nodeF);
+    printf("count = %d\n", count(nodeF));
+    int index = 0;
+    removeHead(nodeF);
+    removeHead(nodeF);
+    removeHead(nodeF);
+    removeHead(nodeF);
+    removeHead(nodeF);
+    removeHead(nodeF);
+    removeHead(nodeF);
+    removeHead(nodeF);
+    printf("index %d, value %s\n", index, getByIndex(nodeF, index));
 
     return 0;
 }
